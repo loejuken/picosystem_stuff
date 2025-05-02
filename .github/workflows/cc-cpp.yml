@@ -1,0 +1,31 @@
+name: Build PicoSystem Game
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y cmake gcc-arm-none-eabi ninja-build build-essential
+
+    - name: Build
+      run: |
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_TOOLCHAIN_FILE=../../32blit-sdk/pico.toolchain -DPICO_BOARD=pimoroni_picosystem
+        cmake --build .
+
+    - name: Upload UF2
+      uses: actions/upload-artifact@v3.1.3
+      with:
+        name: blackjack.uf2
+        path: build/*.uf2
